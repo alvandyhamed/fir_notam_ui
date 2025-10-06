@@ -7,7 +7,9 @@ import Countries from './pages/Countries'
 import FIRs from './pages/FIRs'
 import Regions from './pages/Regions'
 import Weather from './pages/Weather'
+import Notams from './pages/Notams'
 import { GlobalStyle, Topbar, Container, Nav } from './styles'
+import NotamDetail from './pages/NotamDetail'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -21,6 +23,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <NavLink to="/firs">FIRs</NavLink>
           <NavLink to="/regions">Regions</NavLink>
           <NavLink to="/wx">Weather</NavLink>
+          <NavLink to="/notams">NOTAMs</NavLink>
+          
         </Nav>
       </Topbar>
       <Container>
@@ -31,6 +35,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="firs" element={<FIRs />} />
             <Route path="regions" element={<Regions />} />
             <Route path="wx" element={<Weather />} />
+            <Route path="notams" element={<Notams />} />
+            <Route path="notams/:id" element={<NotamDetail />} />
           </Route>
         </Routes>
       </Container>

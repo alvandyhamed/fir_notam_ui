@@ -112,4 +112,18 @@ export const api = {
 
   wxTaf: (params: { icao: string; hours?: number }) =>
     signedFetch('/wx/taf', { method: 'GET', query: params, area: 'taf' }),
+  notams: (params: {
+    domesticLocation?: string
+    notamType?: 'N' | 'R' | 'C'
+    classification?: 'INTL' | 'MIL' | 'DOM' | 'LMIL' | 'FDC'
+    notamNumber?: string
+    effectiveStartDate?: string   // ISO
+    effectiveEndDate?: string     // ISO
+    featureType?: string          // CSV از مقادیر مجاز
+    sortBy?: 'icaoLocation' | 'domesticLocation' | 'notamType' | 'notamNumber' | 'effectiveStartDate' | 'effectiveEndDate' | 'featureType'
+    sortOrder?: 'Asc' | 'Desc'
+    pageSize?: number             // <= 1000
+    pageNum?: number              // 1-based
+  }) =>
+    signedFetch('/faa/notams', { method: 'GET', query: params, area: 'notams' }),
 }
