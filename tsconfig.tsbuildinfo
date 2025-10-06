@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/env.d.ts","./src/main.tsx","./src/styles.ts","./src/api/client.ts","./src/api/signing.ts","./src/components/pagination.tsx","./src/pages/airports.tsx","./src/pages/countries.tsx","./src/pages/firs.tsx","./src/pages/regions.tsx","./src/pages/weather.tsx","./src/utils/logger.ts"],"errors":true,"version":"5.9.3"}
