@@ -8,7 +8,7 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8086', // آدرس API واقعی
+        target: 'http://192.168.115.48:8085', // آدرس API واقعی
         changeOrigin: true,
         rewrite: p => p.replace(/^\/api/, ''),
         headers: {
