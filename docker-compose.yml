@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      # اگر لازم شد بیلد-آرگ بده:
+      # args:
+      #   VITE_API_URL: "https://api.example.com"
+    image: my-react-app:node-serve
+    environment:
+      - NODE_ENV=production
+      - PORT=5173
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
