@@ -4,8 +4,8 @@ services:
   web:
     build:
       context: ./app
-      dockerfile: Dockerfile.dev
-    image: fir-notam-ui:dev
+      dockerfile: Dockerfile
+    image: fir-notam-ui
     ports:
       - "5173:5173"   # اگر CRA: "3000:3000"
     environment:
