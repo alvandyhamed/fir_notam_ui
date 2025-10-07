@@ -1,4 +1,6 @@
 // src/api/signing.ts
+import CryptoJS from 'crypto-js'
+
 
 // ----- Types -----
 export type CanonParts = {
@@ -26,12 +28,33 @@ export function sortedQueryString(params: Record<string, any>): string {
 }
 
 // ----- Hash -----
-export function sha256Hex(input: string): Promise<string> {
-  const data = new TextEncoder().encode(input)
-  return crypto.subtle.digest('SHA-256', data).then(buf => {
+// export function sha256Hex(input: string): Promise<string> {
+//   const data = new TextEncoder().encode(input)
+//   return crypto.subtle.digest('SHA-256', data).then(buf => {
+//     const bytes = new Uint8Array(buf)
+//     return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
+//   })
+// }
+
+function getSubtle(): SubtleCrypto | null {
+  try {
+    // @ts-ignore
+    const c = typeof crypto !== 'undefined' ? crypto : (window as any).crypto
+    return c && c.subtle ? c.subtle : null
+  } catch { return null }
+}
+
+export async function sha256Hex(input: string): Promise<string> {
+  const subtle = getSubtle()
+  if (subtle) {
+    const data = new TextEncoder().encode(input)
+    const buf = await subtle.digest('SHA-256', data)
     const bytes = new Uint8Array(buf)
     return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
-  })
+  }
+  // Fallback با CryptoJS
+  const wordArray = CryptoJS.SHA256(CryptoJS.enc.Utf8.parse(input))
+  return wordArray.toString(CryptoJS.enc.Hex)
 }
 
 // ----- Base64 helpers (accept base64url & fix padding) -----
@@ -51,12 +74,24 @@ function b64ToBytes(b64: string): Uint8Array {
 
 // ----- HMAC -----
 export async function hmacSha256Base64(secretB64: string, message: string): Promise<string> {
-  // سرور شما secret را base64-decode می‌کند؛ اینجا هم دقیقاً همین کار را می‌کنیم
-  const keyRaw = b64ToBytes(secretB64)
-  const key = await crypto.subtle.importKey('raw', keyRaw, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
-  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message))
-  // خروجی امضا به Base64 استاندارد
-  return btoa(String.fromCharCode(...new Uint8Array(sig)))
+  const subtle = getSubtle()
+  const normalized = (secretB64 || '').trim().replace(/-/g,'+').replace(/_/g,'/')
+  const padded = normalized + '==='.slice((normalized.length + 3) % 4)
+
+  if (subtle) {
+    const bin = atob(padded)
+    const keyRaw = new Uint8Array(bin.length)
+    for (let i = 0; i < bin.length; i++) keyRaw[i] = bin.charCodeAt(i)
+    const key = await subtle.importKey('raw', keyRaw, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+    const sig = await subtle.sign('HMAC', key, new TextEncoder().encode(message))
+    return btoa(String.fromCharCode(...new Uint8Array(sig)))
+  }
+
+  // Fallback با CryptoJS
+  const keyWA = CryptoJS.enc.Base64.parse(padded)
+  const msgWA = CryptoJS.enc.Utf8.parse(message)
+  const mac = CryptoJS.HmacSHA256(msgWA, keyWA)
+  return CryptoJS.enc.Base64.stringify(mac)
 }
 
 // ----- Canonical builder -----
