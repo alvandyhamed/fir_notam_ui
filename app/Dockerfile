@@ -9,7 +9,7 @@ COPY package*.json ./
 # COPY pnpm-lock.yaml ./
 
 # نصب اولیه (ممکنه بعداً با volume override بشه؛ در compose هندل می‌کنیم)
-RUN npm install -g crypto-js
+RUN npm install
 RUN npm ci
 
 # برای dev داخل کانتینر
