@@ -4,14 +4,21 @@ services:
   web:
     build:
       context: ./app
-      dockerfile: Dockerfile
-      # اگر لازم شد بیلد-آرگ بده:
-      # args:
-      #   VITE_API_URL: "https://api.example.com"
-    image: my-react-app:node-serve
-    environment:
-      - NODE_ENV=production
-      - PORT=5173
+      dockerfile: Dockerfile.dev
+    image: fir-notam-ui:dev
     ports:
-      - "5173:5173"
+      - "5173:5173"   # اگر CRA: "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - HOST=0.0.0.0
+      # برای هات‌ریلود پایدار داخل Docker (بسته به ابزار، یکی/هر دو مفیدند)
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    volumes:
+      - ./app:/app              # کد لوکال با هات‌ریلود
+      - /app/node_modules       # جلوگیری از overwrite شدن node_modules
+    # اطمینان از نصب پکیج‌ها هر بار (به‌ویژه وقتی node_modules خالی است)
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    # اگر CRA:
+    # command: sh -c "npm install && npm start -- --host 0.0.0.0 --port 3000"
     restart: unless-stopped
